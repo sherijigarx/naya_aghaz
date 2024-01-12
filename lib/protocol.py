@@ -56,33 +56,7 @@ class TextToSpeech(bt.Synapse):
           # print(" Deserialize the speech_output into a PyTorch tensor.",self)
         return self
         # raise TypeError("speech_output is not a tensor")
-
-
-class TextToMusic(bt.Synapse):
-    """
-    TextToMusic class inherits from bt.Synapse.
-    It is used to convert text to music.
-    """
-    # Required request input, filled by sending dendrite caller.
-    text_input: Optional[str] = None
-
-    # Here we define music_output as an Optional PyTorch tensor instead of bytes.
-    music_output: Optional[List] = None
-
-    completion: str = None
-
-
-    def deserialize(self) -> List:
-        """
-        Deserialize the music_output into a PyTorch tensor.
-        """
-        # If music_output is a tensor, just return it
-        if isinstance(self.music_output, List):
-          print(" Deserialize the music_output into a PyTorch tensor.",self)
-          return self
-        raise TypeError("music_output is not a tensor")
-
-    
+   
 
 class VoiceClone(bt.Synapse):
     """
@@ -110,3 +84,39 @@ class VoiceClone(bt.Synapse):
         This method would need to be further implemented based on how the bytes data is intended to be used.
         """
         return self
+
+
+class MusicGeneration(bt.Synapse):
+    """
+    MusicGeneration class inherits from bt.Synapse.
+    It is used to convert text to speech.
+    """
+    class Config:
+        """
+        Pydantic model configuration class for Prompting. This class sets validation of attribute assignment as True.
+        validate_assignment set to True means the pydantic model will validate attribute assignments on the class.
+        """
+
+        validate_assignment = True
+
+
+
+    # Required request input, filled by sending dendrite caller.
+    text_input: Optional[str] = None
+    model_name: Optional[str] = None
+    # clone_input: Optional[List] = None
+    # Here we define speech_output as an Optional PyTorch tensor instead of bytes.
+    music_output: Optional[List] = None
+
+    completion: str = None
+
+
+    def deserialize(self) -> List:
+        """
+        Deserialize the speech_output into a PyTorch tensor.
+        """
+        # If speech_output is a tensor, just return it
+        # if isinstance(self.speech_output, List):
+          # print(" Deserialize the speech_output into a PyTorch tensor.",self)
+        return self
+        # raise TypeError("speech_output is not a tensor")

@@ -54,6 +54,7 @@ sys.path.insert(0, project_root)
 sys.path.insert(0, audio_subnet_path)
 
 # import this repo
+from models.text_to_music import MusicGenSmall, MusicGenMedium, MusicGenLarge
 from models.text_to_speech_models import SunoBark, TextToSpeechModels, ElevenLabsTTS, EnglishTextToSpeech
 from models.voice_clone import ElevenLabsClone  
 import lib.protocol
@@ -69,6 +70,9 @@ def get_config():
     )
     parser.add_argument(
         "--clone_model", default= 'elevenlabs/eleven' , help="The model to be used for Voice cloning." 
+    )
+    parser.add_argument(
+        "--music_model", default= 'facebook/musicgen-small' , help="The model to be used for Music Generation." 
     )
     parser.add_argument(
         "--eleven_api", default='' , help="API key to be used for Eleven Labs." 
@@ -135,6 +139,21 @@ def main(config):
             bt.logging.error(f"Eleven Labs API key is required for the model: {config.model}")
             exit(1)     
     # =========================================== Text To Speech model selection ============================================
+    
+    # =========================================== Text To Music model selection ============================================
+        if config.model_ttm == "facebook/musicgen-small":
+            bt.logging.info("Using the Text-To-Music with the supplied model: facebook/musicgen-small")
+            ttm_models = MusicGenSmall()
+        elif config.model_ttm == "facebook/musicgen-medium":
+            bt.logging.info("Using the Text-To-Music with the supplied model: facebook/musicgen-medium")
+            ttm_models = MusicGenMedium()
+        elif config.model_ttm == "cvssp/audioldm":
+            bt.logging.info("Using the Text-To-Music with the supplied model: cvssp/audioldm")
+            ttm_models = MusicGenLarge()
+        else:
+            bt.logging.error(f"Wrong model supplied for Text-To-Music: {config.model_ttm}")
+            exit(1) 
+    # =========================================== Text To Music model selection ============================================
             
     # =========================================== Voice Clone model selection ===============================================    
         if config.clone_model is not None and config.clone_model == "elevenlabs/eleven" and config.eleven_api is not None:
@@ -403,7 +422,126 @@ def main(config):
             except Exception as e:
                 print(f"An error occurred while processing speech output: {e}")
 
+
+########################################### Text to Music ##########################################    
+
+
+
+    # The blacklist function decides if a request should be ignored.
+    def music_blacklist_fn(synapse: lib.protocol.MusicGeneration) -> typing.Tuple[bool, str]:
+        if synapse.dendrite.hotkey not in metagraph.hotkeys:
+            # Ignore requests from unrecognized entities.
+            bt.logging.trace(
+                f"Blacklisting unrecognized hotkey {synapse.dendrite.hotkey}"
+            )
+            return True, "Unrecognized hotkey"
+        bt.logging.trace(
+            f"Not Blacklisting recognized hotkey {synapse.dendrite.hotkey}"
+        )
+        return False, "Hotkey recognized!"
+
+    # The priority function determines the order in which requests are handled.
+    # More valuable or higher-priority requests are processed before others.
+    def music_priority_fn(synapse: lib.protocol.MusicGeneration) -> float:
+        caller_uid = metagraph.hotkeys.index(
+            synapse.dendrite.hotkey
+        )  # Get the caller index.
+        prirority = float(metagraph.S[caller_uid])  # Return the stake as the priority.
+        bt.logging.trace(
+            f"Prioritizing {synapse.dendrite.hotkey} with value: ", prirority
+        )
+        return prirority
+
+    def ProcessMusic(synapse: lib.protocol.MusicGeneration) -> lib.protocol.MusicGeneration:
+        bt.logging.success("The prompt received from validator!")
+        if config.model_ttm == "facebook/musicgen-small":
+            speech = ttm_models.generate_speech(synapse.text_input)
+        if config.model_ttm == "facebook/musicgen-medium":
+            speech = ttm_models.generate_speech(synapse.text_input)
+        if config.model_ttm == "cvssp/audioldm":
+            speech = ttm_models.generate_speech(synapse.text_input)
+            audio_data = speech / torch.max(torch.abs(speech))
+
+            # If the audio is mono, ensure it has a channel dimension
+            if audio_data.ndim == 1:
+                audio_data = audio_data.unsqueeze(0)
+
+            # convert to 32-bit PCM
+            audio_data_int = (audio_data * 2147483647).type(torch.IntTensor)
+
+            # Save the audio data as integers
+            torchaudio.save('music.wav', src=audio_data_int, sample_rate=16000)
+            # Open the WAV file and read the frames
+            sample_width = None
+            try:
+                with wave.open('muisc.wav', 'rb') as wav_file:
+                    frames = wav_file.readframes(wav_file.getnframes())
+                    sample_width = wav_file.getsampwidth()
+            except Exception as e:
+                print(f"An error occurred while reading the audio data: {e}")
+            # Initialize dtype to a default value
+            dtype = None
+            if sample_width == 2:
+                dtype = np.int16
+            elif sample_width == 1:
+                dtype = np.int8
+            elif sample_width == 4:
+                dtype = np.int32
+
+            # Check if dtype has been assigned a value
+            if dtype is None:
+                print(f"Unexpected sample width: {sample_width}")
+                return
+
+            # Convert the bytes data to a numpy array
+            audio_array = np.frombuffer(frames, dtype=dtype)
+            # Convert the numpy array to a list
+            speech = audio_array.tolist()
+
+        # Check if 'speech' contains valid audio data
+        if speech is None:
+            bt.logging.error("No speech generated!")
+            return None
+        else:
+            try:
+                bt.logging.success("Text to Speech has been generated!")
+                if config.model == "facebook/mms-tts-eng":
+                    # Convert the list to a tensor
+                    speech_tensor = torch.Tensor(speech)
+
+                    # Normalize the speech data
+                    audio_data = speech_tensor / torch.max(torch.abs(speech_tensor))
+
+                    # Convert to 32-bit PCM
+                    audio_data_int = (audio_data * 2147483647).type(torch.IntTensor)
+
+                    # Add an extra dimension to make it a 2D tensor
+                    audio_data_int = audio_data_int.unsqueeze(0)
+
+                    # Save the audio data as a .wav file
+                    synapse.speech_output = speech  # Convert PyTorch tensor to a list
+
+                elif config.model == "suno/bark":
+                    speech = speech.cpu().numpy().squeeze()
+                    synapse.model_name = config.model
+                    synapse.speech_output = speech.tolist()
+
+                elif config.model == "elevenlabs/eleven":
+                    speech_file = save_audio(speech)
+                    synapse.model_name = config.model
+                    speech = convert_audio_to_tensor(speech_file)
+                    synapse.speech_output = speech
+                else:
+                    
+                    synapse.speech_output = speech.tolist()  # Convert PyTorch tensor to a list
+                return synapse
+            except Exception as e:
+                print(f"An error occurred while processing speech output: {e}")
+
+
 ####################################################### Attach Axon  ##############################################################
+
+
     # The axon handles request processing, allowing validators to send this process requests.
     axon = bt.axon(wallet=wallet, config=config)
     bt.logging.info(f"Axon {axon}")
@@ -417,6 +555,9 @@ def main(config):
         forward_fn= ProcessSpeech,
         blacklist_fn= speech_blacklist_fn,
         priority_fn= speech_priority_fn,
+        forward_fn= ProcessMusic,
+        blacklist_fn= music_blacklist_fn,
+        priority_fn= music_priority_fn,
     )
 
     # Serve passes the axon information to the network + netuid we are hosting on.
