@@ -28,6 +28,8 @@ class MusicGenSmall:
     def __init__(self, model_name="facebook/musicgen-small"):
         self.processor = AutoProcessor.from_pretrained(model_name)
         self.model = MusicgenForConditionalGeneration.from_pretrained(model_name)
+        self.device = "cuda:0"
+        self.model.to(self.device);
 
     def generate_music(self, prompt):
         try:
