@@ -16,3 +16,4 @@ tabulate
 gitpython
 TTS
 pydub
+audiocraft
