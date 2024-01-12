@@ -72,7 +72,7 @@ def get_config():
         "--clone_model", default= 'elevenlabs/eleven' , help="The model to be used for Voice cloning." 
     )
     parser.add_argument(
-        "--music_model", default= 'facebook/musicgen-small' , help="The model to be used for Music Generation." 
+        "--music_model", default= 'facebook/musicgen-large' , help="The model to be used for Music Generation." 
     )
     parser.add_argument(
         "--eleven_api", default='' , help="API key to be used for Eleven Labs." 
@@ -147,8 +147,8 @@ def main(config):
         elif config.model_ttm == "facebook/musicgen-medium":
             bt.logging.info("Using the Text-To-Music with the supplied model: facebook/musicgen-medium")
             ttm_models = MusicGenMedium()
-        elif config.model_ttm == "cvssp/audioldm":
-            bt.logging.info("Using the Text-To-Music with the supplied model: cvssp/audioldm")
+        elif config.model_ttm == "facebook/musicgen-large":
+            bt.logging.info("Using the Text-To-Music with the supplied model: facebook/musicgen-large")
             ttm_models = MusicGenLarge()
         else:
             bt.logging.error(f"Wrong model supplied for Text-To-Music: {config.model_ttm}")
