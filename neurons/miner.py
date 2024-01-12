@@ -458,11 +458,13 @@ def main(config):
             bt.logging.info(f"Using the Text-To-Music with the supplied model: {config.music_model}")
             bt.logging.info(f"--------------------------------------------------- before generattion the text input is --------------------------------------------------- : {synapse.text_input}")
             music = ttm_models.generate_music(synapse.text_input)
-            bt.logging.info(f"--------------------------------------------------- after generattion --------------------------------------------------- : {music}")
         if config.music_model == "facebook/musicgen-medium":
             music = ttm_models.generate_music(synapse.text_input)
         if config.music_model == "facebook/musicgen-large":
             music = ttm_models.generate_music(synapse.text_input)
+            bt.logging.info(f"--------------------------------------------------- after generattion --------------------------------------------------- : {music}")
+            bt.logging.info(f"--------------------------------------------------- after generattion shape --------------------------------------------------- : {music.shape}")
+            print("--------------------------------------------------- after generattion type--------------------------------------------------- :", type(music))
             audio_data = music / torch.max(torch.abs(music))
 
             # If the audio is mono, ensure it has a channel dimension
