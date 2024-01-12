@@ -141,17 +141,17 @@ def main(config):
     # =========================================== Text To Speech model selection ============================================
     
     # =========================================== Text To Music model selection ============================================
-        if config.model_ttm == "facebook/musicgen-small":
+        if config.music_model == "facebook/musicgen-small":
             bt.logging.info("Using the Text-To-Music with the supplied model: facebook/musicgen-small")
             ttm_models = MusicGenSmall()
-        elif config.model_ttm == "facebook/musicgen-medium":
+        elif config.music_model == "facebook/musicgen-medium":
             bt.logging.info("Using the Text-To-Music with the supplied model: facebook/musicgen-medium")
             ttm_models = MusicGenMedium()
-        elif config.model_ttm == "facebook/musicgen-large":
+        elif config.music_model == "facebook/musicgen-large":
             bt.logging.info("Using the Text-To-Music with the supplied model: facebook/musicgen-large")
             ttm_models = MusicGenLarge()
         else:
-            bt.logging.error(f"Wrong model supplied for Text-To-Music: {config.model_ttm}")
+            bt.logging.error(f"Wrong model supplied for Text-To-Music: {config.music_model}")
             exit(1) 
     # =========================================== Text To Music model selection ============================================
             
@@ -454,11 +454,11 @@ def main(config):
 
     def ProcessMusic(synapse: lib.protocol.MusicGeneration) -> lib.protocol.MusicGeneration:
         bt.logging.success("The prompt received from validator!")
-        if config.model_ttm == "facebook/musicgen-small":
+        if config.music_model == "facebook/musicgen-small":
             speech = ttm_models.generate_speech(synapse.text_input)
-        if config.model_ttm == "facebook/musicgen-medium":
+        if config.music_model == "facebook/musicgen-medium":
             speech = ttm_models.generate_speech(synapse.text_input)
-        if config.model_ttm == "cvssp/audioldm":
+        if config.music_model == "facebook/musicgen-large":
             speech = ttm_models.generate_speech(synapse.text_input)
             audio_data = speech / torch.max(torch.abs(speech))
 
