@@ -41,11 +41,11 @@ class MusicGenerationService(AIModelService):
         if not os.path.exists(self.ttm_source_dir):
             # If not, create the directory
             os.makedirs(self.ttm_source_dir)
-        self.ttm_source_dir = os.path.join(audio_subnet_path, 'ttm_target')
+        self.ttm_target_dir = os.path.join(audio_subnet_path, 'ttm_target')
         # Check if the directory exists
-        if not os.path.exists(self.ttm_source_dir):
+        if not os.path.exists(self.ttm_target_dir):
             # If not, create the directory
-            os.makedirs(self.ttm_source_dir)
+            os.makedirs(self.ttm_target_dir)
         ###################################### DIRECTORY STRUCTURE ###########################################
 
     def load_prompts(self):
@@ -195,7 +195,7 @@ class MusicGenerationService(AIModelService):
 
             # Save the audio data as a .wav file
             if self.islocaltts:
-                output_path = os.path.join(self.ttm_source_dir, f'{self.p_index}_output_{axon.hotkey}.wav')
+                output_path = os.path.join(self.ttm_target_dir, f'{self.p_index}_output_{axon.hotkey}.wav')
             else:
                 output_path = os.path.join('/tmp', f'output_{axon.hotkey}.wav')
             
