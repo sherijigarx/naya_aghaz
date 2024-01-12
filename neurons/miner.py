@@ -452,6 +452,24 @@ def main(config):
         )
         return prirority
 
+    def convert_music_to_tensor(audio_file):
+        '''Convert the audio file to a tensor'''
+        try:
+            # Get the file extension
+            _, file_extension = os.path.splitext(audio_file)
+
+            if file_extension.lower() in ['.wav', '.mp3']:
+                # load the audio file
+                audio, sample_rate = torchaudio.load(audio_file)
+                # convert the audio file to a tensor/list
+                audio = audio[0].tolist()
+                return audio
+            else:
+                bt.logging.error(f"Unsupported file format: {file_extension}")
+                return None
+        except Exception as e:
+            bt.logging.error(f"An error occurred while converting the file: {e}")
+
     def ProcessMusic(synapse: lib.protocol.MusicGeneration) -> lib.protocol.MusicGeneration:
         bt.logging.success("The prompt received from validator!")
         if config.music_model == "facebook/musicgen-small":
@@ -465,80 +483,18 @@ def main(config):
         bt.logging.info(f"--------------------------------------------------- after generattion --------------------------------------------------- : {music}")
         bt.logging.info(f"--------------------------------------------------- after generattion shape --------------------------------------------------- : {music.shape}")
         print("--------------------------------------------------- after generattion type--------------------------------------------------- :", type(music))
-        audio_data = music / torch.max(torch.abs(music))
-
-        # If the audio is mono, ensure it has a channel dimension
-        if audio_data.ndim == 1:
-            audio_data = audio_data.unsqueeze(0)
-
-        # convert to 32-bit PCM
-        audio_data_int = (audio_data * 2147483647).type(torch.IntTensor)
-
-        # Save the audio data as integers
-        torchaudio.save('music.wav', src=audio_data_int, sample_rate=16000)
-        # Open the WAV file and read the frames
-        sample_width = None
-        try:
-            with wave.open('muisc.wav', 'rb') as wav_file:
-                frames = wav_file.readframes(wav_file.getnframes())
-                sample_width = wav_file.getsampwidth()
-        except Exception as e:
-            print(f"An error occurred while reading the audio data: {e}")
-        # Initialize dtype to a default value
-        dtype = None
-        if sample_width == 2:
-            dtype = np.int16
-        elif sample_width == 1:
-            dtype = np.int8
-        elif sample_width == 4:
-            dtype = np.int32
-
-        # Check if dtype has been assigned a value
-        if dtype is None:
-            print(f"Unexpected sample width: {sample_width}")
-            return
-
-        # Convert the bytes data to a numpy array
-        audio_array = np.frombuffer(frames, dtype=dtype)
-        # Convert the numpy array to a list
-        music = audio_array.tolist()
-
+        
+    
         # Check if 'music' contains valid audio data
         if music is None:
             bt.logging.error("No music generated!")
             return None
         else:
             try:
-                bt.logging.success("Text to music has been generated!")
-                if config.model == "facebook/mms-tts-eng":
-                    # Convert the list to a tensor
-                    music_tensor = torch.Tensor(music)
-
-                    # Normalize the music data
-                    audio_data = music_tensor / torch.max(torch.abs(music_tensor))
-
-                    # Convert to 32-bit PCM
-                    audio_data_int = (audio_data * 2147483647).type(torch.IntTensor)
-
-                    # Add an extra dimension to make it a 2D tensor
-                    audio_data_int = audio_data_int.unsqueeze(0)
-
-                    # Save the audio data as a .wav file
-                    synapse.music_output = music  # Convert PyTorch tensor to a list
-
-                elif config.model == "suno/bark":
-                    music = music.cpu().numpy().squeeze()
-                    synapse.model_name = config.model
-                    synapse.music_output = music.tolist()
-
-                elif config.model == "elevenlabs/eleven":
-                    music_file = save_audio(music)
-                    synapse.model_name = config.model
-                    music = convert_audio_to_tensor(music_file)
-                    synapse.music_output = music
-                else:
-                    
-                    synapse.music_output = music.tolist()  # Convert PyTorch tensor to a list
+                sampling_rate = 32000
+                write_wav("musicgen_out.wav", rate=sampling_rate, data=music)
+                music = convert_music_to_tensor("musicgen_out.wav")
+                synapse.music_output = music
                 return synapse
             except Exception as e:
                 print(f"An error occurred while processing music output: {e}")
