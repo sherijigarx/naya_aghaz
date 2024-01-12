@@ -93,14 +93,14 @@ class MusicGenerationService(AIModelService):
             del new_scores
 
         # check if there is a file in the tts_source directory with the name tts_prompts.csv
-        bt.logging.trace(f"------------------------------------ before checking the local prompts ------------------------------------ {self.ttm_source_dir}")
+        bt.logging.info(f"------------------------------------ before checking the local prompts ------------------------------------ {self.ttm_source_dir}")
         if os.path.exists(os.path.join(self.ttm_source_dir, 'ttm_prompts.csv')) and not self.islocaltts:
-            bt.logging.trace(f"------------------------------------ Found prompts in ------------------------------------ {self.ttm_source_dir}")
+            bt.logging.info(f"------------------------------------ Found prompts in ------------------------------------ {self.ttm_source_dir}")
             self.islocaltts = True
             self.load_local_prompts()
-            bt.logging.trace(f"------------------------------------ Found local prompts in ------------------------------------ {self.ttm_source_dir}")
+            bt.logging.info(f"------------------------------------ Found local prompts in ------------------------------------ {self.ttm_source_dir}")
             l_prompts = self.local_prompts
-            bt.logging.trace(f"------------------------------------ local Prompts example ------------------------------------ {l_prompts}")
+            bt.logging.info(f"------------------------------------ local Prompts example ------------------------------------ {l_prompts}")
             for p_index, lprompt in enumerate(l_prompts):                
                 # if step % 2 == 0:
                 if len(lprompt) > 256:
@@ -113,13 +113,13 @@ class MusicGenerationService(AIModelService):
                 self.process_responses(filtered_axons,responses, lprompt)
 
                 if self.last_reset_weights_block + 1800 < self.current_block:
-                    bt.logging.trace(f"Clearing weights for validators and nodes without IPs")
+                    bt.logging.info(f"Clearing weights for validators and nodes without IPs")
                     self.last_reset_weights_block = self.current_block        
                     # set all nodes without ips set to 0
                     scores = scores * torch.Tensor([self.metagraph.neurons[uid].axon_info.ip != '0.0.0.0' for uid in self.metagraph.uids])
             self.islocaltts = False
         else:
-            bt.logging.trace("No prompts found or wrong file name was given. Using Huggingface Dataset for prompts.")
+            bt.logging.info("No prompts found or wrong file name was given. Using Huggingface Dataset for prompts.")
             g_prompts = self.load_prompts()
             g_prompt = random.choice(g_prompts)
             while len(g_prompt) > 256:
@@ -132,7 +132,7 @@ class MusicGenerationService(AIModelService):
                 self.process_responses(filtered_axons,responses, g_prompt)
 
                 if self.last_reset_weights_block + 1800 < self.current_block:
-                    bt.logging.trace(f"Clearing weights for validators and nodes without IPs")
+                    bt.logging.info(f"Clearing weights for validators and nodes without IPs")
                     self.last_reset_weights_block = self.current_block        
                     # set all nodes without ips set to 0
                     scores = scores * torch.Tensor([self.metagraph.neurons[uid].axon_info.ip != '0.0.0.0' for uid in self.metagraph.uids])
