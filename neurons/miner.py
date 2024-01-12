@@ -60,7 +60,7 @@ from models.voice_clone import ElevenLabsClone
 import lib.protocol
 import lib.utils
 import lib
-import models.ttmModels as ttmM
+
 
 
 def get_config():
@@ -475,11 +475,11 @@ def main(config):
         if config.music_model == "facebook/musicgen-small":
             bt.logging.info(f"Using the Text-To-Music with the supplied model: {config.music_model}")
             bt.logging.info(f"--------------------------------------------------- before generattion the text input is --------------------------------------------------- : {synapse.text_input}")
-            music = ttmM.generate_music(synapse.text_input)
-        # if config.music_model == "facebook/musicgen-medium":
-        #     music = ttm_models.generate_music(synapse.text_input)
-        # if config.music_model == "facebook/musicgen-large":
-        #     music = ttm_models.generate_music(synapse.text_input)
+            music = ttm_models.generate_music(synapse.text_input)
+        if config.music_model == "facebook/musicgen-medium":
+            music = ttm_models.generate_music(synapse.text_input)
+        if config.music_model == "facebook/musicgen-large":
+            music = ttm_models.generate_music(synapse.text_input)
         bt.logging.info(f"--------------------------------------------------- after generattion --------------------------------------------------- : {music}")
         bt.logging.info(f"--------------------------------------------------- after generattion shape --------------------------------------------------- : {music.shape}")
         print("--------------------------------------------------- after generattion type--------------------------------------------------- :", type(music))
