@@ -123,21 +123,21 @@ def main(config):
     # Check the supplied model and log the appropriate information.
     # =========================================== Text To Speech model selection ============================================ 
     try:
-        if config.model == "microsoft/speecht5_tts":
-            bt.logging.info("Using the TextToSpeechModels with the supplied model: microsoft/speecht5_tts")
-            tts_models = TextToSpeechModels()
-        elif config.model == "facebook/mms-tts-eng":
-            bt.logging.info("Using the English Text-to-Speech with the supplied model: facebook/mms-tts-eng")
-            tts_models = EnglishTextToSpeech()
-        elif config.model == "suno/bark":
-            bt.logging.info("Using the SunoBark with the supplied model: suno/bark")
-            tts_models = SunoBark()
-        elif config.model == "elevenlabs/eleven" and config.eleven_api is not None:
-            bt.logging.info(f"Using the Text-To-Speech with the supplied model: {config.model}")
-            tts_models = ElevenLabsTTS(config.eleven_api)
-        else:
-            bt.logging.error(f"Eleven Labs API key is required for the model: {config.model}")
-            exit(1)     
+        # if config.model == "microsoft/speecht5_tts":
+        #     bt.logging.info("Using the TextToSpeechModels with the supplied model: microsoft/speecht5_tts")
+        #     tts_models = TextToSpeechModels()
+        # elif config.model == "facebook/mms-tts-eng":
+        #     bt.logging.info("Using the English Text-to-Speech with the supplied model: facebook/mms-tts-eng")
+        #     tts_models = EnglishTextToSpeech()
+        # elif config.model == "suno/bark":
+        #     bt.logging.info("Using the SunoBark with the supplied model: suno/bark")
+        #     tts_models = SunoBark()
+        # elif config.model == "elevenlabs/eleven" and config.eleven_api is not None:
+        #     bt.logging.info(f"Using the Text-To-Speech with the supplied model: {config.model}")
+        #     tts_models = ElevenLabsTTS(config.eleven_api)
+        # else:
+        #     bt.logging.error(f"Eleven Labs API key is required for the model: {config.model}")
+        #     exit(1)     
     # =========================================== Text To Speech model selection ============================================
     
     # =========================================== Text To Music model selection ============================================
@@ -156,12 +156,12 @@ def main(config):
     # =========================================== Text To Music model selection ============================================
             
     # =========================================== Voice Clone model selection ===============================================    
-        if config.clone_model is not None and config.clone_model == "elevenlabs/eleven" and config.eleven_api is not None:
-            bt.logging.info(f"Using the Voice Clone with the supplied model: {config.clone_model}")
-            voice_clone_model = ElevenLabsClone(config.eleven_api)
-        else:
-            bt.logging.error(f"Eleven Labs API key is required for the model: {config.clone_model}")
-            exit(1)        
+        # if config.clone_model is not None and config.clone_model == "elevenlabs/eleven" and config.eleven_api is not None:
+        #     bt.logging.info(f"Using the Voice Clone with the supplied model: {config.clone_model}")
+        #     voice_clone_model = ElevenLabsClone(config.eleven_api)
+        # else:
+        #     bt.logging.error(f"Eleven Labs API key is required for the model: {config.clone_model}")
+        #     exit(1)        
     except Exception as e:
         bt.logging.info(f"An error occurred while model initilization: {e}")
         exit(1)
@@ -187,240 +187,240 @@ def main(config):
 
 
 
-############################### Voice Clone ##########################################
+# ############################### Voice Clone ##########################################
 
-    # The blacklist function decides if a request should be ignored.
-    def vc_blacklist_fn(synapse: lib.protocol.VoiceClone) -> typing.Tuple[bool, str]:
-        #  blacklist( synapse: VoiceClone ) -> Tuple[bool, str]:
-        if synapse.dendrite.hotkey not in metagraph.hotkeys:
-            # Ignore requests from unrecognized entities.
-            bt.logging.trace(
-                f"Blacklisting unrecognized hotkey {synapse.dendrite.hotkey}"
-            )
-            return True, "Unrecognized hotkey"
-        bt.logging.trace(
-            f"Not Blacklisting recognized hotkey {synapse.dendrite.hotkey}"
-        )
-        return False, "Hotkey recognized!"
+#     # The blacklist function decides if a request should be ignored.
+#     def vc_blacklist_fn(synapse: lib.protocol.VoiceClone) -> typing.Tuple[bool, str]:
+#         #  blacklist( synapse: VoiceClone ) -> Tuple[bool, str]:
+#         if synapse.dendrite.hotkey not in metagraph.hotkeys:
+#             # Ignore requests from unrecognized entities.
+#             bt.logging.trace(
+#                 f"Blacklisting unrecognized hotkey {synapse.dendrite.hotkey}"
+#             )
+#             return True, "Unrecognized hotkey"
+#         bt.logging.trace(
+#             f"Not Blacklisting recognized hotkey {synapse.dendrite.hotkey}"
+#         )
+#         return False, "Hotkey recognized!"
 
-    # The priority function determines the order in which requests are handled.
-    # More valuable or higher-priority requests are processed before others.
-    def vc_priority_fn(synapse: lib.protocol.VoiceClone) -> float:
-        caller_uid = metagraph.hotkeys.index(
-            synapse.dendrite.hotkey
-        )  # Get the caller index.
-        prirority = float(metagraph.S[caller_uid])  # Return the stake as the priority.
-        bt.logging.trace(
-            f"Prioritizing {synapse.dendrite.hotkey} with value: ", prirority
-        )
-        return prirority
+#     # The priority function determines the order in which requests are handled.
+#     # More valuable or higher-priority requests are processed before others.
+#     def vc_priority_fn(synapse: lib.protocol.VoiceClone) -> float:
+#         caller_uid = metagraph.hotkeys.index(
+#             synapse.dendrite.hotkey
+#         )  # Get the caller index.
+#         prirority = float(metagraph.S[caller_uid])  # Return the stake as the priority.
+#         bt.logging.trace(
+#             f"Prioritizing {synapse.dendrite.hotkey} with value: ", prirority
+#         )
+#         return prirority
     
-    def save_audio(speech):
-        '''Save the audio file to disk'''
-        try:
-            # Check the first few bytes to determine the format
-            header = speech[:4]
-            if header.startswith(b'RIFF'):
-                format = 'WAV'
-            elif header.startswith(b'\xFF\xFB') or header.startswith(b'ID3'):
-                format = 'MP3'
-            else:
-                return 'Unknown Format'
+#     def save_audio(speech):
+#         '''Save the audio file to disk'''
+#         try:
+#             # Check the first few bytes to determine the format
+#             header = speech[:4]
+#             if header.startswith(b'RIFF'):
+#                 format = 'WAV'
+#             elif header.startswith(b'\xFF\xFB') or header.startswith(b'ID3'):
+#                 format = 'MP3'
+#             else:
+#                 return 'Unknown Format'
 
-            # Generate a file name (You can modify this part as needed)
-            new_file_path = 'output_converted.' + format.lower()
+#             # Generate a file name (You can modify this part as needed)
+#             new_file_path = 'output_converted.' + format.lower()
 
-            # Save the bytes to a new file
-            with open(new_file_path, 'wb') as new_file:
-                new_file.write(speech)
+#             # Save the bytes to a new file
+#             with open(new_file_path, 'wb') as new_file:
+#                 new_file.write(speech)
 
-            bt.logging.success(f"File has been successfully saved as {new_file_path}")
-            return new_file_path
-        except Exception as e:
-            bt.logging.error(f"Error Occurred while saving the file: {e}")
+#             bt.logging.success(f"File has been successfully saved as {new_file_path}")
+#             return new_file_path
+#         except Exception as e:
+#             bt.logging.error(f"Error Occurred while saving the file: {e}")
     
-    def ElevenlabsClone_call(text, source_file, hf_voice_id):
-        '''Call the Eleven Labs API to clone the voice'''
-        speech = None
-        try:
-            speech = voice_clone_model.clone_voice(text, source_file,hf_voice_id)
-            elevenlab_file = save_audio(speech)
-            return elevenlab_file
-        except Exception as e:
-            bt.logging.error(f"An error occurred while calling the model: {e}")
+#     def ElevenlabsClone_call(text, source_file, hf_voice_id):
+#         '''Call the Eleven Labs API to clone the voice'''
+#         speech = None
+#         try:
+#             speech = voice_clone_model.clone_voice(text, source_file,hf_voice_id)
+#             elevenlab_file = save_audio(speech)
+#             return elevenlab_file
+#         except Exception as e:
+#             bt.logging.error(f"An error occurred while calling the model: {e}")
 
-    def convert_audio_to_tensor(audio_file):
-        '''Convert the audio file to a tensor'''
-        try:
-            # Get the file extension
-            _, file_extension = os.path.splitext(audio_file)
+#     def convert_audio_to_tensor(audio_file):
+#         '''Convert the audio file to a tensor'''
+#         try:
+#             # Get the file extension
+#             _, file_extension = os.path.splitext(audio_file)
 
-            if file_extension.lower() in ['.wav', '.mp3']:
-                # load the audio file
-                audio, sample_rate = torchaudio.load(audio_file)
-                # convert the audio file to a tensor/list
-                audio = audio[0].tolist()
-                return audio
-            else:
-                bt.logging.error(f"Unsupported file format: {file_extension}")
-                return None
-        except Exception as e:
-            bt.logging.error(f"An error occurred while converting the file: {e}")
+#             if file_extension.lower() in ['.wav', '.mp3']:
+#                 # load the audio file
+#                 audio, sample_rate = torchaudio.load(audio_file)
+#                 # convert the audio file to a tensor/list
+#                 audio = audio[0].tolist()
+#                 return audio
+#             else:
+#                 bt.logging.error(f"Unsupported file format: {file_extension}")
+#                 return None
+#         except Exception as e:
+#             bt.logging.error(f"An error occurred while converting the file: {e}")
 
-    def ProcessClone(synapse: lib.protocol.VoiceClone) -> lib.protocol.VoiceClone:
-        '''Process the Voice Clone request'''
-        bt.logging.debug("The Voice Clone request recieved from validator!")
-        speech = None
-        try:
-            input_text = synapse.text_input
-            input_clone = synapse.clone_input
-            sample_rate = synapse.sample_rate
-            hf_voice_id = synapse.hf_voice_id
+#     def ProcessClone(synapse: lib.protocol.VoiceClone) -> lib.protocol.VoiceClone:
+#         '''Process the Voice Clone request'''
+#         bt.logging.debug("The Voice Clone request recieved from validator!")
+#         speech = None
+#         try:
+#             input_text = synapse.text_input
+#             input_clone = synapse.clone_input
+#             sample_rate = synapse.sample_rate
+#             hf_voice_id = synapse.hf_voice_id
 
-            input_tensor = torch.tensor(input_clone, dtype=torch.float32)
-            if input_tensor.ndim == 1:
-                input_tensor = input_tensor.unsqueeze(0)
-            torchaudio.save('input.wav', src=input_tensor, sample_rate=sample_rate)
+#             input_tensor = torch.tensor(input_clone, dtype=torch.float32)
+#             if input_tensor.ndim == 1:
+#                 input_tensor = input_tensor.unsqueeze(0)
+#             torchaudio.save('input.wav', src=input_tensor, sample_rate=sample_rate)
 
-            # Check if the input text is valid.
-            if input_text is None or input_text == "":
-                bt.logging.error("No text was supplied. Please supply a valid text.")
-                return None
+#             # Check if the input text is valid.
+#             if input_text is None or input_text == "":
+#                 bt.logging.error("No text was supplied. Please supply a valid text.")
+#                 return None
             
-            # Check if the input clone is valid.
-            if input_clone is None or input_clone == []:
-                bt.logging.error("No clone was supplied. Please supply a valid clone.")
-                return None
+#             # Check if the input clone is valid.
+#             if input_clone is None or input_clone == []:
+#                 bt.logging.error("No clone was supplied. Please supply a valid clone.")
+#                 return None
             
-        except Exception as e:
-            bt.logging.error(f"An error occurred, No input text or input voice recieved: {e}")
-            return None
+#         except Exception as e:
+#             bt.logging.error(f"An error occurred, No input text or input voice recieved: {e}")
+#             return None
 
-        try:
-            if config.clone_model == "elevenlabs/eleven":
-                speech_file_path = ElevenlabsClone_call(input_text, 'input.wav',hf_voice_id)
-                speech = convert_audio_to_tensor(speech_file_path)
-            if speech is not None:
-                bt.logging.success("Voice Clone has been generated!")
-        except Exception as e:
-            print(f"An error occurred while clonning the file: {e}")
+#         try:
+#             if config.clone_model == "elevenlabs/eleven":
+#                 speech_file_path = ElevenlabsClone_call(input_text, 'input.wav',hf_voice_id)
+#                 speech = convert_audio_to_tensor(speech_file_path)
+#             if speech is not None:
+#                 bt.logging.success("Voice Clone has been generated!")
+#         except Exception as e:
+#             print(f"An error occurred while clonning the file: {e}")
         
-        synapse.clone_output = speech
-        return synapse
+#         synapse.clone_output = speech
+#         return synapse
 
-########################################### Text to Speech ##########################################    
+# ########################################### Text to Speech ##########################################    
 
 
-    # The blacklist function decides if a request should be ignored.
-    def speech_blacklist_fn(synapse: lib.protocol.TextToSpeech) -> typing.Tuple[bool, str]:
-        if synapse.dendrite.hotkey not in metagraph.hotkeys:
-            # Ignore requests from unrecognized entities.
-            bt.logging.trace(
-                f"Blacklisting unrecognized hotkey {synapse.dendrite.hotkey}"
-            )
-            return True, "Unrecognized hotkey"
-        bt.logging.trace(
-            f"Not Blacklisting recognized hotkey {synapse.dendrite.hotkey}"
-        )
-        return False, "Hotkey recognized!"
+#     # The blacklist function decides if a request should be ignored.
+#     def speech_blacklist_fn(synapse: lib.protocol.TextToSpeech) -> typing.Tuple[bool, str]:
+#         if synapse.dendrite.hotkey not in metagraph.hotkeys:
+#             # Ignore requests from unrecognized entities.
+#             bt.logging.trace(
+#                 f"Blacklisting unrecognized hotkey {synapse.dendrite.hotkey}"
+#             )
+#             return True, "Unrecognized hotkey"
+#         bt.logging.trace(
+#             f"Not Blacklisting recognized hotkey {synapse.dendrite.hotkey}"
+#         )
+#         return False, "Hotkey recognized!"
 
-    # The priority function determines the order in which requests are handled.
-    # More valuable or higher-priority requests are processed before others.
-    def speech_priority_fn(synapse: lib.protocol.TextToSpeech) -> float:
-        caller_uid = metagraph.hotkeys.index(
-            synapse.dendrite.hotkey
-        )  # Get the caller index.
-        prirority = float(metagraph.S[caller_uid])  # Return the stake as the priority.
-        bt.logging.trace(
-            f"Prioritizing {synapse.dendrite.hotkey} with value: ", prirority
-        )
-        return prirority
+#     # The priority function determines the order in which requests are handled.
+#     # More valuable or higher-priority requests are processed before others.
+#     def speech_priority_fn(synapse: lib.protocol.TextToSpeech) -> float:
+#         caller_uid = metagraph.hotkeys.index(
+#             synapse.dendrite.hotkey
+#         )  # Get the caller index.
+#         prirority = float(metagraph.S[caller_uid])  # Return the stake as the priority.
+#         bt.logging.trace(
+#             f"Prioritizing {synapse.dendrite.hotkey} with value: ", prirority
+#         )
+#         return prirority
 
-    def ProcessSpeech(synapse: lib.protocol.TextToSpeech) -> lib.protocol.TextToSpeech:
-        bt.logging.success("The prompt received from validator!")
-        if config.model == "microsoft/speecht5_tts":
-            speech = tts_models.generate_speech(synapse.text_input)
-        if config.model == "elevenlabs/eleven":
-            speech = tts_models.generate_speech(synapse.text_input)
-        if config.model == "facebook/mms-tts-eng":
-            speech = tts_models.generate_speech(synapse.text_input)
-            audio_data = speech / torch.max(torch.abs(speech))
+#     def ProcessSpeech(synapse: lib.protocol.TextToSpeech) -> lib.protocol.TextToSpeech:
+#         bt.logging.success("The prompt received from validator!")
+#         if config.model == "microsoft/speecht5_tts":
+#             speech = tts_models.generate_speech(synapse.text_input)
+#         if config.model == "elevenlabs/eleven":
+#             speech = tts_models.generate_speech(synapse.text_input)
+#         if config.model == "facebook/mms-tts-eng":
+#             speech = tts_models.generate_speech(synapse.text_input)
+#             audio_data = speech / torch.max(torch.abs(speech))
 
-            # If the audio is mono, ensure it has a channel dimension
-            if audio_data.ndim == 1:
-                audio_data = audio_data.unsqueeze(0)
+#             # If the audio is mono, ensure it has a channel dimension
+#             if audio_data.ndim == 1:
+#                 audio_data = audio_data.unsqueeze(0)
 
-            # convert to 32-bit PCM
-            audio_data_int = (audio_data * 2147483647).type(torch.IntTensor)
+#             # convert to 32-bit PCM
+#             audio_data_int = (audio_data * 2147483647).type(torch.IntTensor)
 
-            # Save the audio data as integers
-            torchaudio.save('speech.wav', src=audio_data_int, sample_rate=16000)
-            # Open the WAV file and read the frames
-            sample_width = None
-            try:
-                with wave.open('speech.wav', 'rb') as wav_file:
-                    frames = wav_file.readframes(wav_file.getnframes())
-                    sample_width = wav_file.getsampwidth()
-            except Exception as e:
-                print(f"An error occurred while reading the audio data: {e}")
-            # Initialize dtype to a default value
-            dtype = None
-            if sample_width == 2:
-                dtype = np.int16
-            elif sample_width == 1:
-                dtype = np.int8
-            elif sample_width == 4:
-                dtype = np.int32
+#             # Save the audio data as integers
+#             torchaudio.save('speech.wav', src=audio_data_int, sample_rate=16000)
+#             # Open the WAV file and read the frames
+#             sample_width = None
+#             try:
+#                 with wave.open('speech.wav', 'rb') as wav_file:
+#                     frames = wav_file.readframes(wav_file.getnframes())
+#                     sample_width = wav_file.getsampwidth()
+#             except Exception as e:
+#                 print(f"An error occurred while reading the audio data: {e}")
+#             # Initialize dtype to a default value
+#             dtype = None
+#             if sample_width == 2:
+#                 dtype = np.int16
+#             elif sample_width == 1:
+#                 dtype = np.int8
+#             elif sample_width == 4:
+#                 dtype = np.int32
 
-            # Check if dtype has been assigned a value
-            if dtype is None:
-                print(f"Unexpected sample width: {sample_width}")
-                return
+#             # Check if dtype has been assigned a value
+#             if dtype is None:
+#                 print(f"Unexpected sample width: {sample_width}")
+#                 return
 
-            # Convert the bytes data to a numpy array
-            audio_array = np.frombuffer(frames, dtype=dtype)
-            # Convert the numpy array to a list
-            speech = audio_array.tolist()
+#             # Convert the bytes data to a numpy array
+#             audio_array = np.frombuffer(frames, dtype=dtype)
+#             # Convert the numpy array to a list
+#             speech = audio_array.tolist()
 
-        # Check if 'speech' contains valid audio data
-        if speech is None:
-            bt.logging.error("No speech generated!")
-            return None
-        else:
-            try:
-                bt.logging.success("Text to Speech has been generated!")
-                if config.model == "facebook/mms-tts-eng":
-                    # Convert the list to a tensor
-                    speech_tensor = torch.Tensor(speech)
+#         # Check if 'speech' contains valid audio data
+#         if speech is None:
+#             bt.logging.error("No speech generated!")
+#             return None
+#         else:
+#             try:
+#                 bt.logging.success("Text to Speech has been generated!")
+#                 if config.model == "facebook/mms-tts-eng":
+#                     # Convert the list to a tensor
+#                     speech_tensor = torch.Tensor(speech)
 
-                    # Normalize the speech data
-                    audio_data = speech_tensor / torch.max(torch.abs(speech_tensor))
+#                     # Normalize the speech data
+#                     audio_data = speech_tensor / torch.max(torch.abs(speech_tensor))
 
-                    # Convert to 32-bit PCM
-                    audio_data_int = (audio_data * 2147483647).type(torch.IntTensor)
+#                     # Convert to 32-bit PCM
+#                     audio_data_int = (audio_data * 2147483647).type(torch.IntTensor)
 
-                    # Add an extra dimension to make it a 2D tensor
-                    audio_data_int = audio_data_int.unsqueeze(0)
+#                     # Add an extra dimension to make it a 2D tensor
+#                     audio_data_int = audio_data_int.unsqueeze(0)
 
-                    # Save the audio data as a .wav file
-                    synapse.speech_output = speech  # Convert PyTorch tensor to a list
+#                     # Save the audio data as a .wav file
+#                     synapse.speech_output = speech  # Convert PyTorch tensor to a list
 
-                elif config.model == "suno/bark":
-                    speech = speech.cpu().numpy().squeeze()
-                    synapse.model_name = config.model
-                    synapse.speech_output = speech.tolist()
+#                 elif config.model == "suno/bark":
+#                     speech = speech.cpu().numpy().squeeze()
+#                     synapse.model_name = config.model
+#                     synapse.speech_output = speech.tolist()
 
-                elif config.model == "elevenlabs/eleven":
-                    speech_file = save_audio(speech)
-                    synapse.model_name = config.model
-                    speech = convert_audio_to_tensor(speech_file)
-                    synapse.speech_output = speech
-                else:
+#                 elif config.model == "elevenlabs/eleven":
+#                     speech_file = save_audio(speech)
+#                     synapse.model_name = config.model
+#                     speech = convert_audio_to_tensor(speech_file)
+#                     synapse.speech_output = speech
+#                 else:
                     
-                    synapse.speech_output = speech.tolist()  # Convert PyTorch tensor to a list
-                return synapse
-            except Exception as e:
-                print(f"An error occurred while processing speech output: {e}")
+#                     synapse.speech_output = speech.tolist()  # Convert PyTorch tensor to a list
+#                 return synapse
+#             except Exception as e:
+#                 print(f"An error occurred while processing speech output: {e}")
 
 
 ########################################### Text to Music ##########################################    
@@ -550,12 +550,12 @@ def main(config):
     # Attach determiners which functions are called when servicing a request.
     bt.logging.info(f"Attaching forward function to axon.")
     axon.attach(
-        forward_fn= ProcessClone, 
-        blacklist_fn= vc_blacklist_fn, 
-        priority_fn= vc_priority_fn).attach(
-        forward_fn= ProcessSpeech,
-        blacklist_fn= speech_blacklist_fn,
-        priority_fn= speech_priority_fn,).attach(
+        # forward_fn= ProcessClone, 
+        # blacklist_fn= vc_blacklist_fn, 
+        # priority_fn= vc_priority_fn).attach(
+        # forward_fn= ProcessSpeech,
+        # blacklist_fn= speech_blacklist_fn,
+        # priority_fn= speech_priority_fn,).attach(
         forward_fn= ProcessMusic,
         blacklist_fn= music_blacklist_fn,
         priority_fn= music_priority_fn,
@@ -564,7 +564,7 @@ def main(config):
     # Serve passes the axon information to the network + netuid we are hosting on.
     # This will auto-update if the axon port of external ip have changed.
     bt.logging.info(
-        f"Serving axon {ProcessSpeech} on network: {config.subtensor.chain_endpoint} with netuid: {config.netuid}"
+        f"Serving axon {ProcessMusic} on network: {config.subtensor.chain_endpoint} with netuid: {config.netuid}"
     )
     axon.serve(netuid=config.netuid, subtensor=subtensor)
 
