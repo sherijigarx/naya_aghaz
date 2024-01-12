@@ -94,8 +94,8 @@ class MusicGenerationService(AIModelService):
 
         # check if there is a file in the tts_source directory with the name tts_prompts.csv
         if os.path.exists(os.path.join(self.ttm_source_dir, 'ttm_prompts.csv')) and not self.islocaltts:
+            bt.logging.trace(f"------------------------------------ Found prompts in ------------------------------------ {self.ttm_source_dir}")
             self.islocaltts = True
-
             self.load_local_prompts()
             bt.logging.trace(f"------------------------------------ Found local prompts in ------------------------------------ {self.ttm_source_dir}")
             l_prompts = self.local_prompts
