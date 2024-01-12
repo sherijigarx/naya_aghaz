@@ -58,7 +58,7 @@ class MusicGenerationService(AIModelService):
             self.local_prompts = pd.read_csv(os.path.join(self.ttm_source_dir, 'ttm_prompts.csv'), header=None, index_col=False)
             self.local_prompts = self.local_prompts[0].values.tolist()
             bt.logging.info(f"Loaded prompts from {self.ttm_source_dir}")
-            os.remove(os.path.join(self.ttm_source_dir, 'ttm_prompts.csv'))
+            # os.remove(os.path.join(self.ttm_source_dir, 'ttm_prompts.csv'))
         
     async def run_async(self):
         step = 0
@@ -105,7 +105,7 @@ class MusicGenerationService(AIModelService):
                     continue
                 self.p_index = p_index
                 filtered_axons = [self.metagraph.axons[i] for i in self.get_filtered_axons()]
-                bt.logging.info(f"--------------------------------- Prompt are being used locally for TTS ---------------------------------")
+                bt.logging.info(f"--------------------------------- Prompt are being used locally for Text-To-Music ---------------------------------")
                 responses = self.query_network(filtered_axons,lprompt)
                 self.process_responses(filtered_axons,responses, lprompt)
 
@@ -124,7 +124,7 @@ class MusicGenerationService(AIModelService):
                 g_prompt = random.choice(g_prompts)
             if step % 2 == 0:
                 filtered_axons = [self.metagraph.axons[i] for i in self.get_filtered_axons()]
-                bt.logging.info(f"--------------------------------- Prompt are being used from HuggingFace Dataset for TTS ---------------------------------")
+                bt.logging.info(f"--------------------------------- Prompt are being used from HuggingFace Dataset for Text-To-Music ---------------------------------")
                 responses = self.query_network(filtered_axons,g_prompt)
                 self.process_responses(filtered_axons,responses, g_prompt)
 
