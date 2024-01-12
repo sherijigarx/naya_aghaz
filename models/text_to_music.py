@@ -36,7 +36,7 @@ class MusicGenSmall:
                 padding=True,
                 return_tensors="pt",
             )
-            audio_values = self.model.generate(**inputs, max_new_tokens=256)
+            audio_values = self.model.generate(**inputs, max_new_tokens=1503)
             return audio_values[0, 0].numpy()
         except Exception as e:
             print(f"An error occurred in facebook/musicgen-small: {e}")
@@ -54,7 +54,7 @@ class MusicGenMedium:
                 padding=True,
                 return_tensors="pt",
             )
-            audio_values = self.model.generate(**inputs, max_new_tokens=256)
+            audio_values = self.model.generate(**inputs, max_new_tokens=1503)
             print(audio_values[0, 0])
             return audio_values[0, 0].numpy()
         except Exception as e:
@@ -73,7 +73,7 @@ class MusicGenLarge:
                 padding=True,
                 return_tensors="pt",
             )
-            audio_values = self.model.generate(**inputs, max_new_tokens=256)
+            audio_values = self.model.generate(**inputs, max_new_tokens=1503)
             return audio_values[0, 0].numpy()
         except Exception as e:
             print(f"An error occurred in facebook/musicgen-large: {e}")

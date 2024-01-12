@@ -483,7 +483,6 @@ def main(config):
         bt.logging.info(f"--------------------------------------------------- after generattion --------------------------------------------------- : {music}")
         bt.logging.info(f"--------------------------------------------------- after generattion shape --------------------------------------------------- : {music.shape}")
         print("--------------------------------------------------- after generattion type--------------------------------------------------- :", type(music))
-        
     
         # Check if 'music' contains valid audio data
         if music is None:
@@ -493,6 +492,7 @@ def main(config):
             try:
                 sampling_rate = 32000
                 write_wav("musicgen_out.wav", rate=sampling_rate, data=music)
+                bt.logging.success(f"Text to Music has been generated! and saved to: musicgen_out.wav")
                 music = convert_music_to_tensor("musicgen_out.wav")
                 synapse.music_output = music
                 return synapse
