@@ -462,46 +462,46 @@ def main(config):
             music = ttm_models.generate_music(synapse.text_input)
         if config.music_model == "facebook/musicgen-large":
             music = ttm_models.generate_music(synapse.text_input)
-            bt.logging.info(f"--------------------------------------------------- after generattion --------------------------------------------------- : {music}")
-            bt.logging.info(f"--------------------------------------------------- after generattion shape --------------------------------------------------- : {music.shape}")
-            print("--------------------------------------------------- after generattion type--------------------------------------------------- :", type(music))
-            audio_data = music / torch.max(torch.abs(music))
+        bt.logging.info(f"--------------------------------------------------- after generattion --------------------------------------------------- : {music}")
+        bt.logging.info(f"--------------------------------------------------- after generattion shape --------------------------------------------------- : {music.shape}")
+        print("--------------------------------------------------- after generattion type--------------------------------------------------- :", type(music))
+        audio_data = music / torch.max(torch.abs(music))
 
-            # If the audio is mono, ensure it has a channel dimension
-            if audio_data.ndim == 1:
-                audio_data = audio_data.unsqueeze(0)
+        # If the audio is mono, ensure it has a channel dimension
+        if audio_data.ndim == 1:
+            audio_data = audio_data.unsqueeze(0)
 
-            # convert to 32-bit PCM
-            audio_data_int = (audio_data * 2147483647).type(torch.IntTensor)
+        # convert to 32-bit PCM
+        audio_data_int = (audio_data * 2147483647).type(torch.IntTensor)
 
-            # Save the audio data as integers
-            torchaudio.save('music.wav', src=audio_data_int, sample_rate=16000)
-            # Open the WAV file and read the frames
-            sample_width = None
-            try:
-                with wave.open('muisc.wav', 'rb') as wav_file:
-                    frames = wav_file.readframes(wav_file.getnframes())
-                    sample_width = wav_file.getsampwidth()
-            except Exception as e:
-                print(f"An error occurred while reading the audio data: {e}")
-            # Initialize dtype to a default value
-            dtype = None
-            if sample_width == 2:
-                dtype = np.int16
-            elif sample_width == 1:
-                dtype = np.int8
-            elif sample_width == 4:
-                dtype = np.int32
+        # Save the audio data as integers
+        torchaudio.save('music.wav', src=audio_data_int, sample_rate=16000)
+        # Open the WAV file and read the frames
+        sample_width = None
+        try:
+            with wave.open('muisc.wav', 'rb') as wav_file:
+                frames = wav_file.readframes(wav_file.getnframes())
+                sample_width = wav_file.getsampwidth()
+        except Exception as e:
+            print(f"An error occurred while reading the audio data: {e}")
+        # Initialize dtype to a default value
+        dtype = None
+        if sample_width == 2:
+            dtype = np.int16
+        elif sample_width == 1:
+            dtype = np.int8
+        elif sample_width == 4:
+            dtype = np.int32
 
-            # Check if dtype has been assigned a value
-            if dtype is None:
-                print(f"Unexpected sample width: {sample_width}")
-                return
+        # Check if dtype has been assigned a value
+        if dtype is None:
+            print(f"Unexpected sample width: {sample_width}")
+            return
 
-            # Convert the bytes data to a numpy array
-            audio_array = np.frombuffer(frames, dtype=dtype)
-            # Convert the numpy array to a list
-            music = audio_array.tolist()
+        # Convert the bytes data to a numpy array
+        audio_array = np.frombuffer(frames, dtype=dtype)
+        # Convert the numpy array to a list
+        music = audio_array.tolist()
 
         # Check if 'music' contains valid audio data
         if music is None:
