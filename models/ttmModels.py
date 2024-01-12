@@ -26,7 +26,7 @@ import torchaudio
 model_name="facebook/musicgen-small"
 processor = AutoProcessor.from_pretrained(model_name)
 model = MusicgenForConditionalGeneration.from_pretrained(model_name)
-model.to("cuda")
+model.to("cuda:0")
 
 
 def generate_music(prompt):
