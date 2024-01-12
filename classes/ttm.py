@@ -197,20 +197,15 @@ class MusicGenerationService(AIModelService):
                 output_path = os.path.join('/tmp', f'output_{axon.hotkey}.wav')
             
             # Check if any WAV file with .wav extension exists and delete it
-            existing_wav_files = [f for f in os.listdir('/tmp') if f.endswith('.wav')]
-            for existing_file in existing_wav_files:
-                try:
-                    os.remove(os.path.join('/tmp', existing_file))
-                except Exception as e:
-                    bt.logging.error(f"Error deleting existing WAV file: {e}")
+            # existing_wav_files = [f for f in os.listdir('/tmp') if f.endswith('.wav')]
+            # for existing_file in existing_wav_files:
+            #     try:
+            #         os.remove(os.path.join('/tmp', existing_file))
+            #     except Exception as e:
+            #         bt.logging.error(f"Error deleting existing WAV file: {e}")
 
             # Save the audio file
-            if model_name == "suno/bark":
-                sampling_rate = 24000 
-            elif model_name == "elevenlabs/eleven": 
-                sampling_rate = 44000
-            else:
-                sampling_rate = 16000
+            sampling_rate = 32000
             torchaudio.save(output_path, src=audio_data_int, sample_rate=sampling_rate)
             print(f"Saved audio file to {output_path}")
 
@@ -267,7 +262,8 @@ class MusicGenerationService(AIModelService):
         zipped_uids = list(zip(uids, queryable_uids))
         filtered_uids = list(zip(*filter(lambda x: x[1], zipped_uids)))[0]
         bt.logging.info(f"filtered_uids:{filtered_uids}")
-        dendrites_to_query = random.sample( filtered_uids, min( dendrites_per_query, len(filtered_uids) ) )
+        # dendrites_to_query = random.sample( filtered_uids, min( dendrites_per_query, len(filtered_uids) ) )
+        dendrites_to_query = filtered_uids # remove before launch
         bt.logging.info(f"dendrites_to_query:{dendrites_to_query}")
         return dendrites_to_query
 
