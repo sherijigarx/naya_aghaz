@@ -455,12 +455,13 @@ def main(config):
     def ProcessMusic(synapse: lib.protocol.MusicGeneration) -> lib.protocol.MusicGeneration:
         bt.logging.success("The prompt received from validator!")
         if config.music_model == "facebook/musicgen-small":
-            speech = ttm_models.generate_music(synapse.text_input)
+            music = ttm_models.generate_music(synapse.text_input)
         if config.music_model == "facebook/musicgen-medium":
-            speech = ttm_models.generate_music(synapse.text_input)
+            music = ttm_models.generate_music(synapse.text_input)
         if config.music_model == "facebook/musicgen-large":
-            speech = ttm_models.generate_music(synapse.text_input)
-            audio_data = speech / torch.max(torch.abs(speech))
+            music = ttm_models.generate_music(synapse.text_input)
+            bt.logging.info(f"--------------------------------------------------- Music --------------------------------------------------- : {music}")
+            audio_data = music / torch.max(torch.abs(music))
 
             # If the audio is mono, ensure it has a channel dimension
             if audio_data.ndim == 1:
@@ -496,21 +497,21 @@ def main(config):
             # Convert the bytes data to a numpy array
             audio_array = np.frombuffer(frames, dtype=dtype)
             # Convert the numpy array to a list
-            speech = audio_array.tolist()
+            music = audio_array.tolist()
 
-        # Check if 'speech' contains valid audio data
-        if speech is None:
-            bt.logging.error("No speech generated!")
+        # Check if 'music' contains valid audio data
+        if music is None:
+            bt.logging.error("No music generated!")
             return None
         else:
             try:
-                bt.logging.success("Text to Speech has been generated!")
+                bt.logging.success("Text to music has been generated!")
                 if config.model == "facebook/mms-tts-eng":
                     # Convert the list to a tensor
-                    speech_tensor = torch.Tensor(speech)
+                    music_tensor = torch.Tensor(music)
 
-                    # Normalize the speech data
-                    audio_data = speech_tensor / torch.max(torch.abs(speech_tensor))
+                    # Normalize the music data
+                    audio_data = music_tensor / torch.max(torch.abs(music_tensor))
 
                     # Convert to 32-bit PCM
                     audio_data_int = (audio_data * 2147483647).type(torch.IntTensor)
@@ -519,24 +520,24 @@ def main(config):
                     audio_data_int = audio_data_int.unsqueeze(0)
 
                     # Save the audio data as a .wav file
-                    synapse.speech_output = speech  # Convert PyTorch tensor to a list
+                    synapse.music_output = music  # Convert PyTorch tensor to a list
 
                 elif config.model == "suno/bark":
-                    speech = speech.cpu().numpy().squeeze()
+                    music = music.cpu().numpy().squeeze()
                     synapse.model_name = config.model
-                    synapse.speech_output = speech.tolist()
+                    synapse.music_output = music.tolist()
 
                 elif config.model == "elevenlabs/eleven":
-                    speech_file = save_audio(speech)
+                    music_file = save_audio(music)
                     synapse.model_name = config.model
-                    speech = convert_audio_to_tensor(speech_file)
-                    synapse.speech_output = speech
+                    music = convert_audio_to_tensor(music_file)
+                    synapse.music_output = music
                 else:
                     
-                    synapse.speech_output = speech.tolist()  # Convert PyTorch tensor to a list
+                    synapse.music_output = music.tolist()  # Convert PyTorch tensor to a list
                 return synapse
             except Exception as e:
-                print(f"An error occurred while processing speech output: {e}")
+                print(f"An error occurred while processing music output: {e}")
 
 
 ####################################################### Attach Axon  ##############################################################
