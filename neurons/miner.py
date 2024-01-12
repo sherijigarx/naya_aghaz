@@ -455,11 +455,11 @@ def main(config):
     def ProcessMusic(synapse: lib.protocol.MusicGeneration) -> lib.protocol.MusicGeneration:
         bt.logging.success("The prompt received from validator!")
         if config.music_model == "facebook/musicgen-small":
-            speech = ttm_models.generate_speech(synapse.text_input)
+            speech = ttm_models.generate_music(synapse.text_input)
         if config.music_model == "facebook/musicgen-medium":
-            speech = ttm_models.generate_speech(synapse.text_input)
+            speech = ttm_models.generate_music(synapse.text_input)
         if config.music_model == "facebook/musicgen-large":
-            speech = ttm_models.generate_speech(synapse.text_input)
+            speech = ttm_models.generate_music(synapse.text_input)
             audio_data = speech / torch.max(torch.abs(speech))
 
             # If the audio is mono, ensure it has a channel dimension

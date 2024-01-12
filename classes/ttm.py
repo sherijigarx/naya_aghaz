@@ -27,7 +27,7 @@ class MusicGenerationService(AIModelService):
     def __init__(self):
         super().__init__()  # Initializes base class components
         self.load_prompts()
-        self.total_dendrites_per_query = 5  # 25
+        self.total_dendrites_per_query = 25  # 25
         self.minimum_dendrites_per_query = 3  # Example value, adjust as needed
         self.current_block = self.subtensor.block
         self.last_updated_block = self.current_block - (self.current_block % 100)
@@ -97,7 +97,9 @@ class MusicGenerationService(AIModelService):
             self.islocaltts = True
 
             self.load_local_prompts()
+            bt.logging.trace(f"------------------------------------ Found local prompts in ------------------------------------ {self.ttm_source_dir}")
             l_prompts = self.local_prompts
+            bt.logging.trace(f"------------------------------------ local Prompts example ------------------------------------ {l_prompts}")
             for p_index, lprompt in enumerate(l_prompts):                
                 # if step % 2 == 0:
                 if len(lprompt) > 256:
