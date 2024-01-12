@@ -30,13 +30,17 @@ class MusicGenSmall:
         self.model = MusicgenForConditionalGeneration.from_pretrained(model_name)
 
     def generate_music(self, prompt):
-        inputs = self.processor(
-            text=[prompt],
-            padding=True,
-            return_tensors="pt",
-        )
-        audio_values = self.model.generate(**inputs, max_new_tokens=1503)
-        return audio_values[0, 0].numpy()
+        try:
+            inputs = self.processor(
+                text=[prompt],
+                padding=True,
+                return_tensors="pt",
+            )
+            audio_values = self.model.generate(**inputs, max_new_tokens=1503)
+            return audio_values[0, 0].numpy()
+        except Exception as e:
+            print(f"An error occurred in facebook/musicgen-small: {e}")
+            return None
     
 class MusicGenMedium:
     def __init__(self, model_name="facebook/musicgen-medium"):
@@ -44,14 +48,18 @@ class MusicGenMedium:
         self.model = MusicgenForConditionalGeneration.from_pretrained(model_name)
 
     def generate_music(self, prompt):
-        inputs = self.processor(
-            text=[prompt],
-            padding=True,
-            return_tensors="pt",
-        )
-        audio_values = self.model.generate(**inputs, max_new_tokens=1503)
-        print(audio_values[0, 0])
-        return audio_values[0, 0].numpy()
+        try:
+            inputs = self.processor(
+                text=[prompt],
+                padding=True,
+                return_tensors="pt",
+            )
+            audio_values = self.model.generate(**inputs, max_new_tokens=1503)
+            print(audio_values[0, 0])
+            return audio_values[0, 0].numpy()
+        except Exception as e:
+            print(f"An error occurred in facebook/musicgen-medium: {e}")
+            return None
 
 class MusicGenLarge:
     def __init__(self, model_name="facebook/musicgen-large"):
@@ -59,10 +67,14 @@ class MusicGenLarge:
         self.model = MusicgenForConditionalGeneration.from_pretrained(model_name)
 
     def generate_music(self, prompt):
-        inputs = self.processor(
-            text=[prompt],
-            padding=True,
-            return_tensors="pt",
-        )
-        audio_values = self.model.generate(**inputs, max_new_tokens=1503)
-        return audio_values[0, 0].numpy()
+        try:
+            inputs = self.processor(
+                text=[prompt],
+                padding=True,
+                return_tensors="pt",
+            )
+            audio_values = self.model.generate(**inputs, max_new_tokens=1503)
+            return audio_values[0, 0].numpy()
+        except Exception as e:
+            print(f"An error occurred in facebook/musicgen-large: {e}")
+            return None

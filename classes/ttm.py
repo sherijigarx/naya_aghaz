@@ -93,14 +93,10 @@ class MusicGenerationService(AIModelService):
             del new_scores
 
         # check if there is a file in the tts_source directory with the name tts_prompts.csv
-        bt.logging.info(f"------------------------------------ before checking the local prompts ------------------------------------ {self.ttm_source_dir}")
         if os.path.exists(os.path.join(self.ttm_source_dir, 'ttm_prompts.csv')) and not self.islocaltts:
-            bt.logging.info(f"------------------------------------ Found prompts in ------------------------------------ {self.ttm_source_dir}")
             self.islocaltts = True
             self.load_local_prompts()
-            bt.logging.info(f"------------------------------------ Found local prompts in ------------------------------------ {self.ttm_source_dir}")
             l_prompts = self.local_prompts
-            bt.logging.info(f"------------------------------------ local Prompts example ------------------------------------ {l_prompts}")
             for p_index, lprompt in enumerate(l_prompts):                
                 # if step % 2 == 0:
                 if len(lprompt) > 256:
