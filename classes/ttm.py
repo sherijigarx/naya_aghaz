@@ -10,6 +10,7 @@ import random
 import torchaudio
 # Import your module
 import lib.utils
+import lib.ttm_score
 import lib
 import traceback
 import pandas as pd

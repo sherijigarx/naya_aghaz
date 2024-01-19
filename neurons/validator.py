@@ -39,8 +39,8 @@ from classes.ttm import MusicGenerationService
 
 async def main():
     # AIModelService()
-    tts_service = TextToSpeechService()
-    vc_service = VoiceCloningService()
+    # tts_service = TextToSpeechService()
+    # vc_service = VoiceCloningService()
     ttm_service = MusicGenerationService()
 
     ttm_task = asyncio.create_task(ttm_service.run_async())

@@ -55,15 +55,24 @@ class MusicQualityEvaluator:
         pass
 
     def evaluate_music_quality(self, file_path, text=None):
-        snr_value = MetricEvaluator.calculate_snr(file_path)
-        print(f'SNR: {snr_value} dB')
+        try:
+            snr_value = MetricEvaluator.calculate_snr(file_path)
+            print(f'SNR: {snr_value} dB')
+        except:
+            print("SNR could not be calculated")
 
-        smoothness_score = MetricEvaluator.calculate_smoothness(file_path)
-        print(f'Smoothness Score: {smoothness_score}')
+        try:
+            smoothness_score = MetricEvaluator.calculate_smoothness(file_path)
+            print(f'Smoothness Score: {smoothness_score}')
+        except:
+            print("Smoothness could not be calculated")
 
-        consistency_score = MetricEvaluator.calculate_consistency(file_path, text)
-        print(f"Consistency Score: {consistency_score}")
-
+        try:
+            consistency_score = MetricEvaluator.calculate_consistency(file_path, text)
+            print(f"Consistency Score: {consistency_score}")
+        except:
+            print("Consistency could not be calculated")
+            
         # Normalize scores and calculate aggregate score
         normalized_snr = snr_value / 20.0
         normalized_smoothness = smoothness_score
