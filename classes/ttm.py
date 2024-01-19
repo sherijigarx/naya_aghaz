@@ -230,7 +230,7 @@ class MusicGenerationService(AIModelService):
         """
         try:
             # Call the scoring function from lib.reward
-            score = lib.reward.score(output_path, prompt)
+            score = lib.ttm_score.MusicQualityEvaluator.evaluate_music_quality(output_path, prompt)
             return score
         except Exception as e:
             bt.logging.error(f"Error scoring output: {e}")
