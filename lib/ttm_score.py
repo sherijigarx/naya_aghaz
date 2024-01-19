@@ -49,9 +49,9 @@ class MetricEvaluator:
 
 
 class MusicQualityEvaluator:
-    def __init__(self, generator, writer):
-        self.generator = generator
-        self.writer = writer
+    def __init__(self):
+        pass
+
 
     def evaluate_music_quality(self, file_path, text=None):
         snr_value = MetricEvaluator.calculate_snr(file_path)
