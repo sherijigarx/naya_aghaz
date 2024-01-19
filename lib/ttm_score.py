@@ -1,3 +1,4 @@
+from huggingface_hub import hf_hub_download
 from transformers import AutoProcessor, MusicgenForConditionalGeneration
 import scipy.io.wavfile
 import numpy as np
@@ -33,7 +34,8 @@ class MetricEvaluator:
     def calculate_consistency(file_path, text):
         try:
             device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-            clap_metric = CLAPTextConsistencyMetric('lukewys/laion_clap/630k-best.pt').to(device)
+            pt_file = hf_hub_download(repo_id="lukewys/laion_clap", filename="630k-best.pt")
+            clap_metric = CLAPTextConsistencyMetric(pt_file).to(device)
             def convert_audio(audio, from_rate, to_rate, to_channels):
                 resampler = torchaudio.transforms.Resample(orig_freq=from_rate, new_freq=to_rate)
                 audio = resampler(audio)
