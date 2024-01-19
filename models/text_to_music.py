@@ -26,8 +26,11 @@ import torchaudio
 
 class MusicGenSmall:
     def __init__(self, model_name="facebook/musicgen-small"):
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.processor = AutoProcessor.from_pretrained(model_name)
         self.model = MusicgenForConditionalGeneration.from_pretrained(model_name)
+        self.model.to(self.device)
+        self.processor.to(self.device)
 
     def generate_music(self, prompt):
         try:
@@ -36,7 +39,7 @@ class MusicGenSmall:
                 padding=True,
                 return_tensors="pt",
             )
-            audio_values = self.model.generate(**inputs, max_new_tokens=512)
+            audio_values = self.model.generate(**inputs, max_new_tokens=1503) #1503
             return audio_values[0, 0].numpy()
         except Exception as e:
             print(f"An error occurred in facebook/musicgen-small: {e}")
