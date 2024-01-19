@@ -30,7 +30,6 @@ class MusicGenSmall:
         self.processor = AutoProcessor.from_pretrained(model_name)
         self.model = MusicgenForConditionalGeneration.from_pretrained(model_name)
         self.model.to(self.device)
-        self.processor.to(self.device)
 
     def generate_music(self, prompt):
         try:
@@ -38,7 +37,7 @@ class MusicGenSmall:
                 text=[prompt],
                 padding=True,
                 return_tensors="pt",
-            )
+            ).to(self.device)
             audio_values = self.model.generate(**inputs, max_new_tokens=1503) #1503
             return audio_values[0, 0].numpy()
         except Exception as e:
