@@ -7,6 +7,8 @@ import torchaudio
 from scipy.signal import hilbert
 from pathlib import Path
 from audiocraft.metrics import CLAPTextConsistencyMetric
+import subprocess
+import os
 
 class MetricEvaluator:
     @staticmethod
@@ -50,8 +52,13 @@ class MetricEvaluator:
 
 class MusicQualityEvaluator:
     def __init__(self):
-        pass
-
+        try:
+            if not os.path.exists('laion_clap') or not os.listdir('laion_clap'):
+                subprocess.run(["git", "clone", "https://huggingface.co/lukewys/laion_clap"], check=True)
+        except subprocess.CalledProcessError as e:
+            print(f"Failed to clone repository: {e}")
+        except Exception as e:
+            print(f"An error occurred: {e}")
 
     def evaluate_music_quality(self, file_path, text=None):
         snr_value = MetricEvaluator.calculate_snr(file_path)
