@@ -32,7 +32,7 @@ class MetricEvaluator:
     @staticmethod
     def calculate_consistency(file_path, text):
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        clap_metric = CLAPTextConsistencyMetric('laion_clap/630k-best.pt').to(device)
+        clap_metric = torch.load('laion_clap/630k-best.pt').to(device)
         def convert_audio(audio, from_rate, to_rate, to_channels):
           resampler = torchaudio.transforms.Resample(orig_freq=from_rate, new_freq=to_rate)
           audio = resampler(audio)
@@ -52,13 +52,7 @@ class MetricEvaluator:
 
 class MusicQualityEvaluator:
     def __init__(self):
-        try:
-            if not os.path.exists('laion_clap') or not os.listdir('laion_clap'):
-                subprocess.run(["git", "clone", "https://huggingface.co/lukewys/laion_clap"], check=True)
-        except subprocess.CalledProcessError as e:
-            print(f"Failed to clone repository: {e}")
-        except Exception as e:
-            print(f"An error occurred: {e}")
+        pass
 
     def evaluate_music_quality(self, file_path, text=None):
         snr_value = MetricEvaluator.calculate_snr(file_path)
