@@ -53,7 +53,7 @@ class MusicQualityEvaluator:
         self.generator = generator
         self.writer = writer
 
-    def evaluate_music_quality(self, file_path, text, sample_rate=16000):
+    def evaluate_music_quality(self, file_path, text):
         snr_value = MetricEvaluator.calculate_snr(file_path)
         print(f'SNR: {snr_value} dB')
 

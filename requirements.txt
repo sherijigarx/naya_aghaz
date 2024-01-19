@@ -17,3 +17,5 @@ gitpython
 TTS
 pydub
 audiocraft
+laion_clap
+pydantic==1.10.13
