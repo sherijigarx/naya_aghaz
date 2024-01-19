@@ -81,7 +81,7 @@ class MusicQualityEvaluator:
 
         # Normalize scores and calculate aggregate score
         normalized_snr = snr_value / 20.0
-        normalized_smoothness = smoothness_score
+        normalized_smoothness = 1 - smoothness_score if smoothness_score is not None else 0
         normalized_consistency = (consistency_score + 1) / 2 if consistency_score is not None else 0
 
         aggregate_score = (normalized_snr + normalized_smoothness + normalized_consistency) / 3.0
