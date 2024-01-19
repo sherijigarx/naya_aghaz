@@ -39,7 +39,7 @@ class MusicGenSmall:
                 return_tensors="pt",
             ).to(self.device)
             audio_values = self.model.generate(**inputs, max_new_tokens=1503) #1503
-            return audio_values[0].numpy()
+            return audio_values[0, 0].cpu().numpy()
         except Exception as e:
             print(f"An error occurred in facebook/musicgen-small: {e}")
             return None
