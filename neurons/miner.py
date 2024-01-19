@@ -35,6 +35,7 @@ import bittensor as bt
 import numpy as np
 import torchaudio
 import traceback
+import subprocess
 import argparse
 import typing
 import torch
@@ -144,6 +145,8 @@ def main(config):
         if config.music_model == "facebook/musicgen-small":
             bt.logging.info("Using the Text-To-Music with the supplied model: facebook/musicgen-small")
             ttm_models = MusicGenSmall()
+            if not os.path.exists('laion_clap') or not os.listdir('laion_clap'):
+                subprocess.run(["git", "clone", "https://huggingface.co/lukewys/laion_clap"])
         elif config.music_model == "facebook/musicgen-medium":
             bt.logging.info("Using the Text-To-Music with the supplied model: facebook/musicgen-medium")
             ttm_models = MusicGenMedium()

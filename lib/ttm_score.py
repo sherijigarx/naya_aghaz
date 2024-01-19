@@ -30,7 +30,7 @@ class MetricEvaluator:
     @staticmethod
     def calculate_consistency(file_path, text):
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        clap_metric = CLAPTextConsistencyMetric('/content/laion_clap/630k-best.pt').to(device)
+        clap_metric = CLAPTextConsistencyMetric('laion_clap/630k-best.pt').to(device)
         def convert_audio(audio, from_rate, to_rate, to_channels):
           resampler = torchaudio.transforms.Resample(orig_freq=from_rate, new_freq=to_rate)
           audio = resampler(audio)
