@@ -31,21 +31,25 @@ class MetricEvaluator:
 
     @staticmethod
     def calculate_consistency(file_path, text):
-        device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        clap_metric = torch.load('laion_clap/630k-best.pt').to(device)
-        def convert_audio(audio, from_rate, to_rate, to_channels):
-          resampler = torchaudio.transforms.Resample(orig_freq=from_rate, new_freq=to_rate)
-          audio = resampler(audio)
-          if to_channels == 1:
-              audio = audio.mean(dim=0, keepdim=True)
-          return audio
+        try:
+            device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+            clap_metric = torch.load('laion_clap/630k-best.pt').to(device)
+            def convert_audio(audio, from_rate, to_rate, to_channels):
+                resampler = torchaudio.transforms.Resample(orig_freq=from_rate, new_freq=to_rate)
+                audio = resampler(audio)
+                if to_channels == 1:
+                    audio = audio.mean(dim=0, keepdim=True)
+                return audio
 
-        audio, sr = torchaudio.load(file_path)
-        audio = convert_audio(audio, from_rate=sr, to_rate=48000, to_channels=1)
+            audio, sr = torchaudio.load(file_path)
+            audio = convert_audio(audio, from_rate=sr, to_rate=48000, to_channels=1)
 
-        clap_metric.update(audio.unsqueeze(0), [text], torch.tensor([audio.shape[1]]), torch.tensor([48000]))
-        consistency_score = clap_metric.compute()
-        return consistency_score
+            clap_metric.update(audio.unsqueeze(0), [text], torch.tensor([audio.shape[1]]), torch.tensor([48000]))
+            consistency_score = clap_metric.compute()
+            return consistency_score
+        except Exception as e:
+            print(f"An error occurred -------------------: {e}")
+            return None
     
 
 
@@ -72,7 +76,7 @@ class MusicQualityEvaluator:
             print(f"Consistency Score: {consistency_score}")
         except:
             print("Consistency could not be calculated")
-            
+
         # Normalize scores and calculate aggregate score
         normalized_snr = snr_value / 20.0
         normalized_smoothness = smoothness_score
